@@ -32,9 +32,16 @@ func main() {
 }
 
 func executeInput(input string) error {
+	// 把使用者的輸入切割成 Array
+	// "ps aux" -> ["ps", "aux"]
+	args := strings.Split(input, " ")
+
 	// 根據使用者的輸入建立一個指令
 	// 譬如說使用者輸入 ls，就建立一個 ls 指令
-	cmd := exec.Command(input)
+	// args[0] 是指令名，放在第一個位置
+	// args[1:]... 是把其他參數依序填入裡面
+	// ["ls", "-l", "-a"] 即 exec.Command("ls", "-l", "-a")
+	cmd := exec.Command(args[0], args[1:]...)
 
 	// 使用 exec.Command 建立的 cmd 預設是不輸出（超怪XD）
 	// 所以要把他的 Stdandard IO 重新設定成系統預設（終端機）
