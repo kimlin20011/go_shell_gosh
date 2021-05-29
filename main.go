@@ -27,6 +27,11 @@ func showPrompt() {
 }
 
 func executeInput(input string) error {
+	// 環境變數展開
+	// 把 input 裡面的環境變數展開
+	// 如果指令是 echo ${USER}_is_smart
+	// 展開後就會變成 echo larry_is_smart
+	input = os.ExpandEnv(input)
 	// 把使用者的輸入切割成 Array
 	// "ps aux" -> ["ps", "aux"]
 	args := strings.Split(input, " ")
