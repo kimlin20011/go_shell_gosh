@@ -10,29 +10,6 @@ import (
 	"strings"
 )
 
-func main() {
-	// 把使用者輸入轉換成 bufio.Reader 型別
-	stdin := bufio.NewReader(os.Stdin)
-
-	for {
-		// 簡單的 prompt
-		//fmt.Print("> ")
-		showPrompt()
-
-		// 逐行讀取使用者輸入
-		input, _ := stdin.ReadString('\n')
-		//並且去除頭尾的空白
-		input = strings.TrimSpace(input)
-
-		// 執行使用者輸入的指令
-		// 如果有錯誤的話就 log 出來
-		err := executeInput(input)
-		if err != nil {
-			log.Println(err)
-		}
-	}
-}
-
 //在shell前面加上user資訊
 func showPrompt() {
 	u, _ := user.Current()   // 取得使用者資訊
@@ -74,4 +51,27 @@ func executeInput(input string) error {
 
 	// 如果有發生錯誤的話就回傳
 	return err
+}
+
+func main() {
+	// 把使用者輸入轉換成 bufio.Reader 型別
+	stdin := bufio.NewReader(os.Stdin)
+
+	for {
+		// 簡單的 prompt
+		//fmt.Print("> ")
+		showPrompt()
+
+		// 逐行讀取使用者輸入
+		input, _ := stdin.ReadString('\n')
+		//並且去除頭尾的空白
+		input = strings.TrimSpace(input)
+
+		// 執行使用者輸入的指令
+		// 如果有錯誤的話就 log 出來
+		err := executeInput(input)
+		if err != nil {
+			log.Println(err)
+		}
+	}
 }

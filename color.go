@@ -5,5 +5,5 @@ func blue(str string) string {
 }
 
 func yellowWithBlueBG(str string) string {
-	return "\033[1;33;44m" + str + "\033[0m"
+	return "\033[1;33m" + str + "\033[0m"
 }
