@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"os/user"
 	"strings"
 )
 
@@ -15,7 +16,8 @@ func main() {
 
 	for {
 		// 簡單的 prompt
-		fmt.Print("> ")
+		//fmt.Print("> ")
+		showPrompt()
 
 		// 逐行讀取使用者輸入
 		input, _ := stdin.ReadString('\n')
@@ -29,6 +31,16 @@ func main() {
 			log.Println(err)
 		}
 	}
+}
+
+//在shell前面加上user資訊
+func showPrompt() {
+	u, _ := user.Current()   // 取得使用者資訊
+	host, _ := os.Hostname() // 取得主機名稱
+	wd, _ := os.Getwd()      // 取得 Working Directory
+
+	// 把字串組合起來放到 Prompt 中
+	fmt.Printf("%s@%s %s > ", u.Username, host, wd)
 }
 
 func executeInput(input string) error {
