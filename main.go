@@ -39,8 +39,14 @@ func showPrompt() {
 	host, _ := os.Hostname() // 取得主機名稱
 	wd, _ := os.Getwd()      // 取得 Working Directory
 
+	// 把 user 跟 host 著成藍色
+	userAndHost := blue(u.Username + "@" + host)
+
+	// 把 Working Directory 變成藍底黃字
+	wd = yellowWithBlueBG(wd)
+
 	// 把字串組合起來放到 Prompt 中
-	fmt.Printf("%s@%s %s > ", u.Username, host, wd)
+	fmt.Printf("%s %s > ", userAndHost, wd)
 }
 
 func executeInput(input string) error {
