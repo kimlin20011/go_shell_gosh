@@ -31,6 +31,22 @@ func executeInput(input string) error {
 	// "ps aux" -> ["ps", "aux"]
 	args := strings.Split(input, " ")
 
+	//自己實作cd指令
+	if args[0] == "cd" {
+		// 如果指令是 cd dirname
+		// 就跑 os.Chdir(dirname)
+		err := os.Chdir(args[1])
+
+		// 並回傳發生的錯誤（例如資料夾不存在）
+		return err
+	}
+	//自己實作exit指令
+	if args[0] == "exit" {
+		// 如果指令是 cd dirname
+		// 就跑 os.Chdir(dirname)
+		os.Exit(1)
+	}
+
 	// 根據使用者的輸入建立一個指令
 	// 譬如說使用者輸入 ls，就建立一個 ls 指令
 	// args[0] 是指令名，放在第一個位置
