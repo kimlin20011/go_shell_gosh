@@ -34,7 +34,8 @@ func executeInput(input string) error {
 	input = os.ExpandEnv(input)
 	// 把使用者的輸入切割成 Array
 	// "ps aux" -> ["ps", "aux"]
-	args := strings.Split(input, " ")
+	//args := strings.Split(input, " ")
+	args := parseArgs(input)
 
 	//自己實作cd指令
 	if args[0] == "cd" {
@@ -94,6 +95,23 @@ func executeInput(input string) error {
 
 	// 如果有發生錯誤的話就回傳
 	return err
+}
+
+// 開頭是alias要另外切
+// paresArgs 就是上圖的 parseArgs
+// 這邊要根據上面的演算法來實作他
+func parseArgs(input string) []string {
+	// 如果 input 是 "alias" 開頭，那最多就切成兩段
+	// 也就是 ["alias", "ooo xxx ooo xxx"]
+	// 後面的空白不會被切到
+	if strings.HasPrefix(input, "alias") {
+		return strings.SplitN(input, " ", 2)
+	}
+
+	// 如果不是 "alias" 開頭
+	// 那就用原本的方法，把所有空白都切開
+	// "ls -l -a" -> ["ls", "-l", "-a"]
+	return strings.Split(input, " ")
 }
 
 func main() {

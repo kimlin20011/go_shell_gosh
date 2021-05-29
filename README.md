@@ -17,3 +17,13 @@ go run main.go color.go
 ```
 go mod init <project-name>
 ```
+
+* alias語法 （將指令設定簡寫）
+`alias name='command -args'`
+* 例如
+`alias gst='git status'`
+* 取消簡寫設定
+`unalias name`
+
+* 測資的file 要import `testing` package
+    * 下`go test`指令可以直接執行測試
