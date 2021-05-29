@@ -51,6 +51,28 @@ func executeInput(input string) error {
 		// 就跑 os.Chdir(dirname)
 		os.Exit(1)
 	}
+	// 如果指令是 export 開頭
+	// 就用 os.Setenv 設置環境變數
+	// args = ["export", "FOO=bar"]
+	if args[0] == "export" {
+		// kv = ["FOO", "bar"]
+		kv := strings.Split(args[1], "=")
+
+		// key = "FOO"
+		// val = "bar"
+		key, val := kv[0], kv[1]
+
+		err := os.Setenv(key, val)
+		return err
+	}
+
+	// 如果指令是 unset 開頭
+	// 就用 os.Unsetenv 刪除環境變數
+	// args = ["unset", "FOO"]
+	if args[0] == "unset" {
+		err := os.Unsetenv(args[1])
+		return err
+	}
 
 	// 根據使用者的輸入建立一個指令
 	// 譬如說使用者輸入 ls，就建立一個 ls 指令
