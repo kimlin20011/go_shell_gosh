@@ -31,5 +31,8 @@ go mod init <project-name>
 * 執行go，可以執行所有需要執行的function
 `go run .`
 
+* [永久設定alias的方法](https://qiita.com/yutat93/items/b5bb9c0366f21bcbea62)
+
 ### gitignore建立網站
 `https://www.toptal.com/developers/gitignore`
+
