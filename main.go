@@ -33,6 +33,10 @@ func executeInput(input string) error {
 	// 展開後就會變成 echo larry_is_smart
 	input = os.ExpandEnv(input)
 
+	// 展開通用字體Wildcard
+	// "ls -l m??go"  ->  "ls -l mango mongo"
+	input = expandWildcardInCmd(input)
+
 	if strings.HasPrefix(input, `\`) {
 		// 如果指令是 \ 開頭，那就把第一個字元去掉
 		// \ls -> ls

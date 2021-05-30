@@ -28,5 +28,8 @@ go mod init <project-name>
 * 測資的file 要import `testing` package
     * 下`go test`指令可以直接執行測試
 
+* 執行go，可以執行所有需要執行的function
+`go run .`
+
 ### gitignore建立網站
 `https://www.toptal.com/developers/gitignore`
