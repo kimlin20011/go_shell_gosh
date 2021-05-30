@@ -33,10 +33,16 @@ func executeInput(input string) error {
 	// 展開後就會變成 echo larry_is_smart
 	input = os.ExpandEnv(input)
 
-	// 把使用者的輸入根據 alias 進行 expandAlias
-	// Ex:  "gst"   ->  "git status"
-	// Ex: "ls -h"  ->  "ls -l -h"
-	input = expandAlias(input)
+	if strings.HasPrefix(input, `\`) {
+		// 如果指令是 \ 開頭，那就把第一個字元去掉
+		// \ls -> ls
+		input = input[1:]
+	} else { // 如果不是 \ 開頭，那就還是跑 expandAlias
+		// 把使用者的輸入根據 alias 進行 expandAlias
+		// Ex:  "gst"   ->  "git status"
+		// Ex: "ls -h"  ->  "ls -l -h"
+		input = expandAlias(input)
+	}
 
 	// 把使用者的輸入切割成 Array
 	// "ps aux" -> ["ps", "aux"]
