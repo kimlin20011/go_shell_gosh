@@ -6,35 +6,107 @@ import (
 	"log"
 	"os"
 	"os/exec"
+	"os/user"
 	"strings"
 )
 
-func main() {
-	// 把使用者輸入轉換成 bufio.Reader 型別
-	stdin := bufio.NewReader(os.Stdin)
+//在shell前面加上user資訊
+func showPrompt() {
+	u, _ := user.Current()   // 取得使用者資訊
+	host, _ := os.Hostname() // 取得主機名稱
+	wd, _ := os.Getwd()      // 取得 Working Directory
 
-	for {
-		// 簡單的 prompt
-		fmt.Print("> ")
+	// 把 user 跟 host 著成藍色
+	userAndHost := blue(u.Username + "@" + host)
 
-		// 逐行讀取使用者輸入
-		input, _ := stdin.ReadString('\n')
-		//並且去除頭尾的空白
-		input = strings.TrimSpace(input)
+	// 把 Working Directory 變成藍底黃字
+	wd = yellowWithBlueBG(wd)
 
-		// 執行使用者輸入的指令
-		// 如果有錯誤的話就 log 出來
-		err := executeInput(input)
-		if err != nil {
-			log.Println(err)
-		}
-	}
+	// 把字串組合起來放到 Prompt 中
+	fmt.Printf("%s %s > ", userAndHost, wd)
 }
 
 func executeInput(input string) error {
+	// 環境變數展開
+	// 把 input 裡面的環境變數展開
+	// 如果指令是 echo ${USER}_is_smart
+	// 展開後就會變成 echo larry_is_smart
+	input = os.ExpandEnv(input)
+
+	// 把使用者的輸入根據 alias 進行 expandAlias
+	// Ex:  "gst"   ->  "git status"
+	// Ex: "ls -h"  ->  "ls -l -h"
+	input = expandAlias(input)
+
 	// 把使用者的輸入切割成 Array
 	// "ps aux" -> ["ps", "aux"]
-	args := strings.Split(input, " ")
+	//args := strings.Split(input, " ")
+	args := parseArgs(input)
+
+	//自己實作cd指令
+	if args[0] == "cd" {
+		// 如果指令是 cd dirname
+		// 就跑 os.Chdir(dirname)
+		err := os.Chdir(args[1])
+
+		// 並回傳發生的錯誤（例如資料夾不存在）
+		return err
+	}
+	//自己實作exit指令
+	if args[0] == "exit" {
+		// 如果指令是 cd dirname
+		// 就跑 os.Chdir(dirname)
+		os.Exit(1)
+	}
+	// 如果指令是 export 開頭
+	// 就用 os.Setenv 設置環境變數
+	// args = ["export", "FOO=bar"]
+	if args[0] == "export" {
+		// kv = ["FOO", "bar"]
+		kv := strings.Split(args[1], "=")
+
+		// key = "FOO"
+		// val = "bar"
+		key, val := kv[0], kv[1]
+
+		err := os.Setenv(key, val)
+		return err
+	}
+
+	// 如果指令是 unset 開頭
+	// 就用 os.Unsetenv 刪除環境變數
+	// args = ["unset", "FOO"]
+	if args[0] == "unset" {
+		err := os.Unsetenv(args[1])
+		return err
+	}
+
+	// 如果使用者輸入 alias 開頭的指令
+	// 譬如說 alias gst='git status'
+	// args = ["alias", "gst='git status'"]
+	if args[0] == "alias" {
+		// 把 args[1] 切成左右兩邊，變成 key 跟 value
+		// kv = ["gst", "'git status'"]
+		kv := strings.Split(args[1], "=")
+
+		// 把 value 的單引號去掉取得真正的 value
+		// key = "gst", val = "git status"
+		key, val := kv[0], strings.Trim(kv[1], "'")
+		setAlias(key, val)
+
+		// 沒有錯誤發生
+		return nil
+	}
+	// 取消快捷設定
+	// args = ["unalias", "gst"]
+	if args[0] == "unalias" {
+		// key = "gst"
+		key := args[1]
+
+		// unsetAlias("gst")
+		unsetAlias(key)
+		return nil
+	}
 
 	// 根據使用者的輸入建立一個指令
 	// 譬如說使用者輸入 ls，就建立一個 ls 指令
@@ -56,4 +128,44 @@ func executeInput(input string) error {
 
 	// 如果有發生錯誤的話就回傳
 	return err
+}
+
+// 開頭是alias要另外切
+// paresArgs 就是上圖的 parseArgs
+// 這邊要根據上面的演算法來實作他
+func parseArgs(input string) []string {
+	// 如果 input 是 "alias" 開頭，那最多就切成兩段
+	// 也就是 ["alias", "ooo xxx ooo xxx"]
+	// 後面的空白不會被切到
+	if strings.HasPrefix(input, "alias") {
+		return strings.SplitN(input, " ", 2)
+	}
+
+	// 如果不是 "alias" 開頭
+	// 那就用原本的方法，把所有空白都切開
+	// "ls -l -a" -> ["ls", "-l", "-a"]
+	return strings.Split(input, " ")
+}
+
+func main() {
+	// 把使用者輸入轉換成 bufio.Reader 型別
+	stdin := bufio.NewReader(os.Stdin)
+
+	for {
+		// 簡單的 prompt
+		//fmt.Print("> ")
+		showPrompt()
+
+		// 逐行讀取使用者輸入
+		input, _ := stdin.ReadString('\n')
+		//並且去除頭尾的空白
+		input = strings.TrimSpace(input)
+
+		// 執行使用者輸入的指令
+		// 如果有錯誤的話就 log 出來
+		err := executeInput(input)
+		if err != nil {
+			log.Println(err)
+		}
+	}
 }
