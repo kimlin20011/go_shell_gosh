@@ -113,6 +113,16 @@ func executeInput(input string) error {
 		unsetAlias(key)
 		return nil
 	}
+	// 如果使用者下的指令是 which 開頭
+	// 譬如說 which gst ls gggg
+	if args[0] == "which" {
+		// 那就把 gst, ls, gggg 依序傳到 lookCommand 裡面
+		// 讓他跑上面的 which 流程
+		for _, cmd := range args[1:] {
+			lookCommand(cmd)
+		}
+		return nil
+	}
 
 	// 根據使用者的輸入建立一個指令
 	// 譬如說使用者輸入 ls，就建立一個 ls 指令
@@ -151,6 +161,32 @@ func parseArgs(input string) []string {
 	// 那就用原本的方法，把所有空白都切開
 	// "ls -l -a" -> ["ls", "-l", "-a"]
 	return strings.Split(input, " ")
+}
+
+func lookCommand(cmd string) {
+	// 先到 Alias Table 裡面找找看指令(gst)
+	value := aliasTable[cmd]
+
+	// 如果找到的話就輸出 gst: aliased to git status
+	// 沒找到的話就繼續往下走
+	if value != "" {
+		fmt.Printf("%s: aliased to %s\n", cmd, value)
+		return
+	}
+
+	// 到 PATH 裡面找找看指令(ls)
+	value, err := exec.LookPath(cmd)
+
+	// 找到的話就輸出 ls: /bin/ls
+	// 沒找到的話就繼續往下走
+	if err == nil {
+		fmt.Printf("%s: %s\n", cmd, value)
+		return
+	}
+
+	// Alias Table 跟 PATH 都找不到這個指令(gggg)
+	// 直接輸出 gggg NOT FOUND
+	fmt.Printf("%s NOT FOUND\n", cmd)
 }
 
 func main() {
