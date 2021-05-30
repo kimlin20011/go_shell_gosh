@@ -32,6 +32,10 @@ go mod init <project-name>
 `go run .`
 
 * [永久設定alias的方法](https://qiita.com/yutat93/items/b5bb9c0366f21bcbea62)
+    * 到`vim ~/.bashrc`，設定想要的alias例如：`alias be='bundle exec'`
+    * 到`vim ~/.bash_profile`，最下面哪一行加上：`source ~/.bashrc`
+    * 終端機執行`source ~/.bash_profile`指令
+    * 如此一來終端機再開始設定的alias就能保存
 
 ### gitignore建立網站
 `https://www.toptal.com/developers/gitignore`
